@@ -110,7 +110,10 @@ local function trim(tokens)
 
     if token.name == 'newline' or index == #tokens then
       if #tags == 1 and ntext == 0 then
-        tags[1].indent = tags[1].name == 'partial' and indent or ''
+        if tags[1].name == 'partial' and #indent > 0 then
+          tags[1].indent = indent
+          table.insert(trimmed, line[1])
+        end
         table.insert(trimmed, tags[1])
       else
         for i = 1, #line do
@@ -198,7 +201,7 @@ end
 
 local function render(tokens, stack, partials, indent)
 
-  local result = indent
+  local result = ''
 
   for index, token in ipairs(tokens) do
     if token.name == 'partial' then
