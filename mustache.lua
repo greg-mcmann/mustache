@@ -255,7 +255,11 @@ local function render(tokens, stack, partials, indent)
     elseif token.name == 'word' or token.name == 'space' then
       result = result .. token.value
     elseif token.name == 'newline' then
-      result = result .. token.value .. indent
+      if #stack == 1 and index == #tokens then
+        result = result .. token.value
+      else
+        result = result .. token.value .. indent
+      end
     end
   end
 
