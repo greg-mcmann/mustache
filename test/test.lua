@@ -12,12 +12,17 @@ local function test(specs)
       if result == test.expected then
         print('o : ' .. test.name)
       else
+        local replace = {
+          ['\n'] = '\\n',
+          ['\r'] = '\\r',
+          ['\t'] = '\\t'
+        }
         print(
           string.format(
             'x : %s\n\nExpected\n%s\nActual\n%s\n',
             test.name,
-            test.expected,
-            result
+            string.gsub(test.expected,'(.)',replace),
+            string.gsub(result,'(.)',replace)
           )
         )
       end
