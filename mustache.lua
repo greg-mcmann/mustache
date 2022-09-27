@@ -84,6 +84,53 @@ local function scan(template)
   end
 end
 
+-- Trim tokens using a line buffer.
+
+local function trimmer()
+
+  local istext = {
+    'escape' = true,
+    'noescape' = true,
+    'word' = true
+  }
+
+  local iscontrol = {
+    'close' = true,
+    'comment' = true,
+    'delimit' = true,
+    'inverse' = true,
+    'partial' = true,
+    'section' = true
+  }
+
+  local line = {}
+  local ntext = 0
+  local ncontrol = 0
+  
+  return function(token)
+
+    local result = ''
+
+    table.insert(line, token.value)
+
+    if istext(token.name) then
+      ntext = ntext + 1
+    elseif iscontrol(token.name) then
+      ncontrol = ncontrol + 1
+    end
+
+    if token.name == 'newline' and (ntext > 0 or ncontrol == 0) then
+      result = table.concat(line)
+      line = {}
+      ntext = 0
+      ncontrol = 0
+    end
+
+    return result
+    
+  end
+end
+
 -- Trim space around standalone mustache tags.
 
 local function trim(tokens)
