@@ -27,7 +27,7 @@ Hello, World!
 
 ## Language Guide
 
-Mustache is a general-purpose templating language that expands tags using values provided by a data table. A 'tag' is indicated by double mustaches. Tags may contain modifier symbols that alter the behavior of the tag. For example, if the tag begins with an exclamation point then it represents a comment. This guide starts with a list of all supported tags, followed by sections describing the various types of tags with examples.
+Mustache is a general-purpose templating language that expands tags using values provided by a data table. A 'tag' is indicated by double mustaches. Tags may contain modifier symbols that alter the behavior of the tag. For example, if the tag begins with an exclamation point then it represents a comment. This guide starts with a list of all supported tags, followed by sections describing each tag with examples.
 
 ### Supported Tags
 
