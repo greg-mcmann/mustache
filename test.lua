@@ -1,10 +1,10 @@
-local mustache = (loadfile '../mustache.lua')()
+local mustache = require "mustache"
 
 local function test(specs)
   for _, path in pairs(specs) do
     print('\n' .. path .. '\n')
     for _, test in ipairs(require(path)) do
-      local result = mustache(
+      local result = mustache.compile(
         test.template or '',
         test.data or {},
         test.partials or {}
@@ -13,16 +13,18 @@ local function test(specs)
         print('o : ' .. test.name)
       else
         local replace = {
-          ['\n'] = '\\n',
+          ['\t'] = '\\t',
           ['\r'] = '\\r',
-          ['\t'] = '\\t'
+          ['\v'] = '\\v',
+          ['\f'] = '\\f',
+          ['\n'] = '\\n',
         }
         print(
           string.format(
             'x : %s\n\nExpected\n%s\nActual\n%s\n',
             test.name,
             string.gsub(test.expected,'(.)',replace),
-            string.gsub(result,'(.)',replace)
+            string.gsub(result or '','(.)',replace)
           )
         )
       end
@@ -31,10 +33,10 @@ local function test(specs)
 end
 
 test({
-  'specs/comments',
-  'specs/delimiters',
-  'specs/interpolation',
-  'specs/sections',
-  'specs/inverted',
-  'specs/partials',
+  'spec/comments',
+  'spec/delimiters',
+  'spec/interpolation',
+  'spec/sections',
+  'spec/inverted',
+  'spec/partials',
 })
