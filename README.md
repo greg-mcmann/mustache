@@ -96,7 +96,7 @@ Sections render a section of a template zero or more times. Each section must ha
 
 ### Partials
 
-Partials render external templates in the context of the current template. The tag's content names the partial template to inject. If the tag is standalone, then the whitespace preceding the tag is used as indentation and prepended to the beginning of each line in the partial template. If a partial can't be found, then the tag will be ignored and you will not receive an error.
+Partials render external templates in the context of the current template. The tag's content names the partial template to inject. If the tag is standalone, then the whitespace preceding the tag is used as indentation and prepended to the beginning of each line in the partial template before the partial is rendered. If a partial can't be found, then the tag will be ignored and you will not receive an error.
 
 **Template**
 ```Text
