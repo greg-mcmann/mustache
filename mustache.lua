@@ -22,7 +22,7 @@ SOFTWARE.
 
 -- Determine if a value is "truthy"
 
-function truthy(value)
+local function truthy(value)
   if type(value) == 'nil' then
     return false
   elseif type(value) == 'boolean' then
@@ -36,9 +36,9 @@ function truthy(value)
   end
 end
 
--- Escape special characters in HTML text
+-- Escape characters with special meaning in HTML
 
-function escapeHtml(text)
+local function escapeHtml(text)
   return text:gsub('.', {
     ['&'] = '&amp;',
     ['<'] = '&lt;',
@@ -48,9 +48,9 @@ function escapeHtml(text)
   })
 end
 
--- Escape special characters in a Lua pattern
+-- Escape characters with special meaning in Lua patterns
 
-function escapePattern(text)
+local function escapePattern(text)
   return text:gsub('.', {
     ["^"] = "%^";
     ["$"] = "%$";
@@ -67,7 +67,7 @@ function escapePattern(text)
   })
 end
 
--- Read the next line from a string
+-- Iterate through lines in a block of text
 
 local function lines(text)
   local start = 1
@@ -96,7 +96,7 @@ end
 
 -- Search for a value in a context stack using a dotted name
 
-function search(stack, name)
+local function search(stack, name)
   local keys = {}
   for key in name:gmatch('[^%.]+') do
     table.insert(keys, key)
@@ -138,18 +138,18 @@ local function scan(template, otag, ctag, start)
     end
   else
     local tags = {
-      { name = 'comment', open = '!', close = '' },
-      { name = 'section', open = '#', close = '' },
-      { name = 'inverse', open = '^', close = '' },
-      { name = 'close',   open = '%/', close = '' },
-      { name = 'partial', open = '>', close = '' },
-      { name = 'nescape', open = '&', close = '' },
-      { name = 'nescape', open = '{', close = '}' },
-      { name = 'delimit', open = '=', close = '=' },
-      { name = 'escape',  open = '', close = '' }
+      { name = 'comment', pattern = '%!%s*(.-)%s*'   },
+      { name = 'section', pattern = '%#%s*(.-)%s*'   },
+      { name = 'inverse', pattern = '%^%s*(.-)%s*'   },
+      { name = 'close',   pattern = '%/%s*(.-)%s*'   },
+      { name = 'partial', pattern = '%>%s*(.-)%s*'   },
+      { name = 'nescape', pattern = '%&%s*(.-)%s*'   },
+      { name = 'nescape', pattern = '%{%s*(.-)%s*%}' },
+      { name = 'delimit', pattern = '%=%s*(.-)%s*%=' },
+      { name = 'escape',  pattern = '%s*(.-)%s*'     }
     }
     for index, tag in ipairs(tags) do
-      local pattern = '^' .. otag .. tag.open .. '%s*(.-)%s*' .. tag.close .. ctag
+      local pattern = '^' .. otag .. tag.pattern .. ctag
       local i, j, capture = template:find(pattern, start)
       if capture then
         return {
@@ -212,7 +212,7 @@ local function trim(tokens)
   return result
 end
 
--- Converts a template into a stream of tokens
+-- Convert a template into a stream of tokens
 
 local function lex(template)
   local tokens = {}
@@ -222,7 +222,6 @@ local function lex(template)
   repeat
     local token = scan(template, otag, ctag, start)
     if token then
-      -- print(token.name, token.value, start)
       start = start + token.advance
       table.insert(tokens, token)
       if token.name == 'delimit' then
@@ -329,5 +328,5 @@ end
 return {
   ['lex'] = lex,
   ['parse'] = parse,
-  ['compile'] = compile,
+  ['compile'] = compile
 }
