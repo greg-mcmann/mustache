@@ -15,13 +15,13 @@ Mustache.lua was designed to be minimal, and fits into a single script file. To 
 
 ```Text
 > mustache = require "mustache"
-> mustache("Hello, World!")
+> mustache.compile("Hello, World!")
 Hello, World!
-> mustache("Hello, {{name}}!", {name="World"})
+> mustache.compile("Hello, {{name}}!", {name="World"})
 Hello, World!
-> mustache("{{>message}}", {}, {message="Hello, World!"})
+> mustache.compile("{{>message}}", {}, {message="Hello, World!"})
 Hello, World!
-> mustache("{{>message}}", {name="World"}, {message="Hello, {{name}}!"})
+> mustache.compile("{{>message}}", {name="World"}, {message="Hello, {{name}}!"})
 Hello, World!
 ```
 
