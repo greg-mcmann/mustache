@@ -22,7 +22,7 @@ SOFTWARE.
 
 -- Determine if a value is "truthy"
 
-function truthy(value)
+local function truthy(value)
   if type(value) == 'nil' then
     return false
   elseif type(value) == 'boolean' then
@@ -38,7 +38,7 @@ end
 
 -- Escape special characters in HTML text
 
-function escapeHtml(text)
+local function escapeHtml(text)
   return text:gsub('.', {
     ['&'] = '&amp;',
     ['<'] = '&lt;',
@@ -50,7 +50,7 @@ end
 
 -- Escape special characters in a Lua pattern
 
-function escapePattern(text)
+local function escapePattern(text)
   return text:gsub('.', {
     ["^"] = "%^";
     ["$"] = "%$";
@@ -96,7 +96,7 @@ end
 
 -- Search for a value in a context stack using a dotted name
 
-function search(stack, name)
+local function search(stack, name)
   local keys = {}
   for key in name:gmatch('[^%.]+') do
     table.insert(keys, key)
