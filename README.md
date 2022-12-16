@@ -45,7 +45,7 @@ Mustache is a general-purpose templating language that expands tags using values
 
 ### Variables
 
-Variables are the most basic tag type. Variables are HTML escaped by default, and must be surrounded by triple mustaches or begin with an ampersand to prevent escaping. The ampersand variation is useful when you need to change the delimiter, which is covered in the "Set Delimiter" topic. The name of the tag is resolved to a key in the data table, starting at the current level of the context stack. The context stack is built by sections, and will be covered in the "Sections" topic. If your data contains nested tables, you can use a dotted name to reference a value deep within your tables. If a value can't be found, then the tag will be ignored and you will not receive an error.
+A variable merges a data value into a template. Variables are HTML escaped by default, and must be surrounded by triple mustaches or begin with an ampersand to prevent escaping. The tag name is resolved to a key in the data table starting from current section. Variables not found in the current section will attempt to resolve in each parent section. If a value can't be found, then the tag will be ignored and you will not receive an error. If your data contains nested tables, you can use a dotted name to reference a value deep within your tables.
 
 **Template**
 ```Text
@@ -69,7 +69,7 @@ Alice knew that the answer was "a > b".
 
 ### Sections
 
-Sections render a section of a template zero or more times. Each section must have an opening tag and a closing tag with the same name. For example, you can create a section for rendering a list of animals with a starting tag `{{#animals}}` followed by a closing tag `{{/animals}}`. Section names are looked up in the data table, and the value's type determines the behavior of the section. If the value is a list, then the section tag will render the contents once for each item in the list. If the value is 'true' then the section is rendered once. If the section is 'false' then the section is not rendered, unless you are rendering an inverted section. Variables in sections are searched starting from the context of the current section before searching parent sections. To get the current item from a list of primitives, or the value evaluated by a conditional section, use the special `.` variable name.
+Sections render a section of a template zero or more times. Each section must have an opening tag and a closing tag with the same name. For example, you can create a section for rendering a list of animals with a starting tag `{{#animals}}` followed by a closing tag `{{/animals}}`. Section names are looked up in the data table, and the value's type determines the behavior of the section. If the value is a list, then the section tag will render the contents once for each item in the list. If the value is 'true' then the section is rendered once. If the section is 'false' then the section is not rendered, unless you are rendering an inverted section. Variables in sections are searched starting from the context of the current section before searching parent sections. To get the current item from a list of primitives, or the value evaluated by a conditional section, use the special `.` variable name. Lines with a standalone opening tag or closing tag are stripped from the output rather than leaving an empty line.
 
 **Template**
 ```Text
@@ -130,7 +130,7 @@ Partials render external templates in the context of the current template. The t
 
 ### Comments
 
-Comments contain content that never appears in the resulting output. Comments may contain a single letter, or span multiple lines. Lines with standalone comments are stripped from the output rather than leaving an empty line.
+A comment is an explanatory note that never appears in the resulting output. Comments may contain a single letter, or span multiple lines. Lines with a standalone comment tag are stripped from the output rather than leaving an empty line.
 
 **Template**
 ```Text
@@ -145,7 +145,7 @@ Hello, World!
 
 ### Set Delimiter
 
-Set delimiter tags change the tag delimiters from `{{` and `}}` to different sequences. The new sequences may not contain whitespace or equal signs. The set delimiter tag is useful when the contents of a template contains tag delimiter sequences. Partials do not inherit changed delimiters from a template.
+Set delimiter tags change the tag delimiters from `{{` and `}}` to different sequences. The new sequences may not contain whitespace or equal signs. The set delimiter tag is useful when the contents of a template contains tag delimiter sequences. Partials do not inherit changed delimiters from a template. Lines with a standalone delimiter tag are stripped from the output rather than leaving an empty line.
 
 **Template**
 ```Text
