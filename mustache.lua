@@ -329,5 +329,5 @@ end
 return {
   ['lex'] = lex,
   ['parse'] = parse,
-  ['compile'] = compile,
+  ['compile'] = compile
 }
