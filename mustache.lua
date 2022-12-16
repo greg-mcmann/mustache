@@ -138,18 +138,18 @@ local function scan(template, otag, ctag, start)
     end
   else
     local tags = {
-      { name = 'comment', open = '!', close = '' },
-      { name = 'section', open = '#', close = '' },
-      { name = 'inverse', open = '^', close = '' },
-      { name = 'close',   open = '%/', close = '' },
-      { name = 'partial', open = '>', close = '' },
-      { name = 'nescape', open = '&', close = '' },
-      { name = 'nescape', open = '{', close = '}' },
-      { name = 'delimit', open = '=', close = '=' },
-      { name = 'escape',  open = '', close = '' }
+      { name = 'comment', pattern = '%!%s*(.-)%s*'   },
+      { name = 'section', pattern = '%#%s*(.-)%s*'   },
+      { name = 'inverse', pattern = '%^%s*(.-)%s*'   },
+      { name = 'close',   pattern = '%/%s*(.-)%s*'   },
+      { name = 'partial', pattern = '%>%s*(.-)%s*'   },
+      { name = 'nescape', pattern = '%&%s*(.-)%s*'   },
+      { name = 'nescape', pattern = '%{%s*(.-)%s*%}' },
+      { name = 'delimit', pattern = '%=%s*(.-)%s*%=' },
+      { name = 'escape',  pattern = '%s*(.-)%s*'     }
     }
     for index, tag in ipairs(tags) do
-      local pattern = '^' .. otag .. tag.open .. '%s*(.-)%s*' .. tag.close .. ctag
+      local pattern = '^' .. otag .. tag.pattern .. ctag
       local i, j, capture = template:find(pattern, start)
       if capture then
         return {
