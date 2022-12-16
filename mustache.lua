@@ -36,7 +36,7 @@ local function truthy(value)
   end
 end
 
--- Escape special characters in HTML text
+-- Escape characters with special meaning in HTML
 
 local function escapeHtml(text)
   return text:gsub('.', {
@@ -48,7 +48,7 @@ local function escapeHtml(text)
   })
 end
 
--- Escape special characters in a Lua pattern
+-- Escape characters with special meaning in Lua patterns
 
 local function escapePattern(text)
   return text:gsub('.', {
@@ -67,7 +67,7 @@ local function escapePattern(text)
   })
 end
 
--- Read the next line from a string
+-- Iterate through lines in a block of text
 
 local function lines(text)
   local start = 1
@@ -212,7 +212,7 @@ local function trim(tokens)
   return result
 end
 
--- Converts a template into a stream of tokens
+-- Convert a template into a stream of tokens
 
 local function lex(template)
   local tokens = {}
@@ -222,7 +222,6 @@ local function lex(template)
   repeat
     local token = scan(template, otag, ctag, start)
     if token then
-      -- print(token.name, token.value, start)
       start = start + token.advance
       table.insert(tokens, token)
       if token.name == 'delimit' then
