@@ -11,7 +11,7 @@ A lightweight Lua implementation of the Mustache templating language.
 
 ## Getting Started
 
-Mustache.lua was designed to be minimal, and fits into a single script file. To use the script, place the script directly in your project or within your [package search path](https://www.lua.org/manual/5.4/manual.html#pdf-package.path). A table loaded from the script, which contains functions necessary to render a Mustache template. Below is an introductory example of how you might render various templates using Lua's interactive mode.
+Mustache.lua was designed to be minimal, and fits into a single script file. To use the script, place the script directly in your project or within your [package search path](https://www.lua.org/manual/5.4/manual.html#pdf-package.path). Importing the script loads a table with functions for rendering a Mustache template. Below is an introductory example of how you might render various templates using Lua's interactive mode.
 
 ```Text
 > mustache = require "mustache"
