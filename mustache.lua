@@ -69,8 +69,8 @@ end
 
 -- Iterate through lines in a document
 
-local function lines(document, start)
-  start = start or 1
+local function lines(document)
+  local start = 1
   return function()
     local match = document:find('\n', start)
     local line = document:sub(start, match)
