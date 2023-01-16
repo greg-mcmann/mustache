@@ -67,31 +67,26 @@ local function escapePattern(text)
   })
 end
 
--- Iterate through lines in a block of text
+-- Iterate through lines in a template
 
-local function lines(text)
+local function lines(template)
   local start = 1
   return function()
-    local x = start
-    local y = text:find('\n', start)
-    if y then
-      start = y + 1
-      return text:sub(x, y)
-    elseif x <= #text then
-      start = #text + 1
-      return text:sub(x)
-    end
+    local match = template:find('\n', start)
+    local line = template:sub(start, match)
+    start = start + #line
+    return #line > 0 and line or nil
   end
 end
 
--- Indent each line within a block of text
+-- Indent each line in a template
 
-local function indent(text, space)
-  local result = {}
-  for line in lines(text) do
-    table.insert(result, space .. line)
+local function indent(template, value)
+  local result = { '' }
+  for line in lines(template) do
+    table.insert(result, line)
   end
-  return table.concat(result)
+  return table.concat(result, value)
 end
 
 -- Search for a value in a context stack using a dotted name
@@ -212,7 +207,7 @@ local function trim(tokens)
   return result
 end
 
--- Convert a template into a stream of tokens
+-- Convert a template into a sequence of tokens
 
 local function lex(template)
   local tokens = {}
@@ -328,5 +323,6 @@ end
 return {
   ['lex'] = lex,
   ['parse'] = parse,
-  ['compile'] = compile
+  ['compile'] = compile,
+  ['version'] = '1.0.0'
 }
