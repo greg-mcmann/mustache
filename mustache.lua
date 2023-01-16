@@ -67,23 +67,23 @@ local function escapePattern(text)
   })
 end
 
--- Iterate through lines in a document
+-- Iterate through lines in a template
 
-local function lines(document)
+local function lines(template)
   local start = 1
   return function()
-    local match = document:find('\n', start)
-    local line = document:sub(start, match)
+    local match = template:find('\n', start)
+    local line = template:sub(start, match)
     start = start + #line
     return #line > 0 and line or nil
   end
 end
 
--- Indent each line in a document
+-- Indent each line in a template
 
-local function indent(document, value)
+local function indent(template, value)
   local result = { '' }
-  for line in lines(document) do
+  for line in lines(template) do
     table.insert(result, line)
   end
   return table.concat(result, value)
@@ -207,7 +207,7 @@ local function trim(tokens)
   return result
 end
 
--- Convert a template into tokens
+-- Convert a template into a sequence of tokens
 
 local function lex(template)
   local tokens = {}
