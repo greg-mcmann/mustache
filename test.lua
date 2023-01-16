@@ -22,43 +22,59 @@ SOFTWARE.
 
 local mustache = require "mustache"
 
-local function test(specs)
-  for _, path in pairs(specs) do
-    print('\n' .. path .. '\n')
-    for _, test in ipairs(require(path)) do
-      local result = mustache.compile(
-        test.template or '',
-        test.data or {},
-        test.partials or {}
-      )
-      if result == test.expected then
-        print('o : ' .. test.name)
-      else
-        local replace = {
-          ['\t'] = '\\t',
-          ['\r'] = '\\r',
-          ['\v'] = '\\v',
-          ['\f'] = '\\f',
-          ['\n'] = '\\n',
-        }
-        print(
-          string.format(
-            'x : %s\n\nExpected\n%s\nActual\n%s\n',
-            test.name,
-            string.gsub(test.expected,'(.)',replace),
-            string.gsub(result or '','(.)',replace)
-          )
-        )
-      end
-    end
-  end
-end
+-- Paths for supported specifications
 
-test({
+local paths = {
   'spec/comments',
   'spec/delimiters',
   'spec/interpolation',
   'spec/sections',
   'spec/inverted',
   'spec/partials',
-})
+}
+
+-- Display non-printable characters
+
+local function reveal(text)
+  return string.gsub(text or '', '(.)', {
+    ['\t'] = '\\t',
+    ['\r'] = '\\r',
+    ['\v'] = '\\v',
+    ['\f'] = '\\f',
+    ['\n'] = '\\n',
+  })
+end
+
+-- Run a single mustache test
+
+local function runTest(test)
+  local result = mustache.compile(
+    test.template or '',
+    test.data or {},
+    test.partials or {}
+  )
+  if result == test.expected then
+    print('o : ' .. test.name)
+  else
+    print('x : ' .. test.name)
+    print(string.format(
+      '\nExpected\n%s\nActual\n%s\n',
+      reveal(test.expected),
+      reveal(result)
+    ))
+  end
+end
+
+-- Run all mustache tests
+
+local function runAll()
+  for _, path in pairs(paths) do
+    print('\n' .. path .. '\n')
+    local tests = require(path)
+    for _, test in ipairs(tests) do
+      runTest(test)
+    end
+  end
+end
+
+runAll()
