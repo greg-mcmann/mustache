@@ -1,5 +1,5 @@
 --[[
-Copyright 2022 Greg McMann
+Copyright 2023 Greg McMann
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -36,6 +36,18 @@ local function truthy(value)
   end
 end
 
+-- Determine if a value is a table
+
+local function isTable(value)
+  return type(value) == 'table'
+end
+
+-- Determine if a table has a key
+
+local function hasKey(table, key)
+  return table[key] ~= nil
+end
+
 -- Escape characters with special meaning in HTML
 
 local function escapeHtml(text)
@@ -67,61 +79,89 @@ local function escapePattern(text)
   })
 end
 
--- Iterate through lines in a template
+-- Split a string on dots
 
-local function lines(template)
+local function split(text)
+  local keys = {}
+  for key in text:gmatch('[^%.]+') do
+    table.insert(keys, key)
+  end
+  return keys
+end
+
+-- Reverse an array
+
+local function reverse(array)
+  local out = {}
+  for index = #array, 1, -1 do
+    out[#out + 1] = array[index]
+  end
+  return out
+end
+
+-- Iterate through values in an array
+
+local function values(array)
+  local index = 0
+  return function()
+    index = index + 1
+    return array[index]
+  end
+end
+
+-- Iterate through lines in a string
+
+local function lines(text)
   local start = 1
   return function()
-    local match = template:find('\n', start)
-    local line = template:sub(start, match)
+    local match = text:find('\n', start)
+    local line = text:sub(start, match)
     start = start + #line
     return #line > 0 and line or nil
   end
 end
 
--- Indent each line in a template
+-- Prefix each line in a string
 
-local function indent(template, value)
+local function prefixLines(text, prefix)
   local result = { '' }
-  for line in lines(template) do
+  for line in lines(text) do
     table.insert(result, line)
   end
-  return table.concat(result, value)
+  return table.concat(result, prefix)
 end
 
 -- Search for a value in a context stack using a dotted name
 
 local function search(stack, name)
-  local keys = {}
-  for key in name:gmatch('[^%.]+') do
-    table.insert(keys, key)
-  end
-  for index = #stack, 1, -1 do
-    local context = stack[index]
-    if #keys == 0 or (#keys > 0 and type(context) == 'table' and context[keys[1]] ~= nil) then
-      for _, key in ipairs(keys) do
-        if type(context) == 'table' then
-          context = context[key]
+  local keys = split(name)
+  for item in values(reverse(stack)) do
+    if #keys == 0 then
+      return item
+    elseif isTable(item) and hasKey(item, keys[1]) then
+      for key in values(keys) do
+        if isTable(item) then
+          item = item[key]
         else
-          context = nil
+          item = nil
         end
       end
-      return context
+      return item
     end
   end
 end
 
--- Read the next token from a template string
+-- Read the next token from a string
 
-local function scan(template, otag, ctag, start)
-  local content = template:match('^(.-)' .. otag, start) or template:sub(start)
+local function scan(text, otag, ctag, start)
+  local content = text:match('^(.-)' .. otag, start) or text:sub(start)
   if #content > 0 then
     local patterns = {
       { name = 'newline', pattern = '^\n' },
       { name = 'space', pattern = '^[ \t\r\v\f]+' },
       { name = 'word', pattern = '^[^ \t\r\v\f\n]+' }
     }
-    for index, pattern in ipairs(patterns) do
+    for pattern in values(patterns) do
       local match = content:match(pattern.pattern)
       if match then
         return {
@@ -143,9 +183,9 @@ local function scan(template, otag, ctag, start)
       { name = 'delimit', pattern = '%=%s*(.-)%s*%=' },
       { name = 'escape',  pattern = '%s*(.-)%s*'     }
     }
-    for index, tag in ipairs(tags) do
+    for tag in values(tags) do
       local pattern = '^' .. otag .. tag.pattern .. ctag
-      local i, j, capture = template:find(pattern, start)
+      local i, j, capture = text:find(pattern, start)
       if capture then
         return {
           name = tag.name,
@@ -207,15 +247,15 @@ local function trim(tokens)
   return result
 end
 
--- Convert a template into a sequence of tokens
+-- Convert a string into a sequence of tokens
 
-local function lex(template)
+local function lex(text)
   local tokens = {}
   local start = 1
   local otag = escapePattern('{{')
   local ctag = escapePattern('}}')
   repeat
-    local token = scan(template, otag, ctag, start)
+    local token = scan(text, otag, ctag, start)
     if token then
       start = start + token.advance
       table.insert(tokens, token)
@@ -239,7 +279,7 @@ local function parse(tokens)
   local stack = {
     { name = 'root', children = {} }
   }
-  for index, token in ipairs(tokens) do
+  for token in values(tokens) do
     token.children = {}
     if token.name == 'close' then
       local top = table.remove(stack)
@@ -270,7 +310,7 @@ local function compile(template, data, partials)
 
   function process(tokens)
     local results = {}
-    for index, token in ipairs(tokens) do
+    for token in values(tokens) do
       local output = ''
       if token.name == 'word' then
         output = token.value
@@ -307,7 +347,7 @@ local function compile(template, data, partials)
       elseif token.name == 'partial' then
         local partial = partials[token.value]
         if partial then
-          local indented = indent(partial, token.indent)
+          local indented = prefixLines(partial, token.indent)
           output = process(parse(trim(lex(indented))))
         end
       end
